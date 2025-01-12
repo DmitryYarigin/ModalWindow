@@ -1,30 +1,37 @@
-const modalController =({modal,btnOpen, btnClose}) => {
+const modalController =({modal,btnOpen, btnClose, time = 300}) => {
     const buttonElems = document.querySelectorAll(btnOpen);
     const modalElem = document.querySelector(modal);
 
     modalElem.style.cssText = `
     display: flex;
-    visability: hidden;
+    visibility: hidden;
     opacity: 0;
-    transition: opacity 300ms ease-in-out;
+    transition: opacity ${time}ms ease-in-out;
     `;
 
     const closeModal = event => {
         const target = event.target;
 
-        if (target === modalElem || target.closest(modal__Close)) {
+        if (target === modalElem ||
+            (btnClose && target.closest(btnClose)) ||
+            event.code === 'Escape') {
             modalElem.style.opacity = 0;
 
             setTimeout(() => {
                 modalElem.style.visibility = 'hidden';
-            }, 300)
-        }
-    }
+            }, time);
 
+            window.removeEventListener('keydown', closeModal);
+            console.log('нажали esc');
+        }
+    };
+
+    
     const openModal = () => {
         modalElem.style.visibility = 'visible';
         modalElem.style.opacity = 1;
-    }
+        window.addEventListener('keydown', closeModal)
+    };
 
     buttonElems.forEach(btn => {
         btn.addEventListener('click', openModal);
@@ -36,12 +43,13 @@ const modalController =({modal,btnOpen, btnClose}) => {
 
 modalController({
     modal: '.modal1',
-    btnOpen: '.section__button1',
-    btnClose: '.modal__close'
+    btnOpen: '.section__button1', 
+    btnClose: '.modal__close',
+    time: '2000'
 });
 
 modalController({
-    modal: '.modal1',
+    modal: '.modal2',
     btnOpen: '.section__button2',
     btnClose: '.modal__close'
 });
